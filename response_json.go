@@ -8,16 +8,12 @@ import (
 
 // OutputJSON encodes the Response to JSON and writes to the http.ResponseWriter
 func OutputJSON(rs *Response, w http.ResponseWriter, r *http.Request) error {
-	fmt.Println(r.URL.Query())
-	
 	// Add headers
 	for i, k := range rs.Headers {
 		for _, v := range k {
 			w.Header().Add(i, v)
 		}
 	}
-	
-	fmt.Println(w.Header())
 
 	if rs.Type == REDIRECT {
 		// Output redirect with parameters
