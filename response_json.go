@@ -3,6 +3,7 @@ package osin
 import (
 	"encoding/json"
 	"net/http"
+	"fmt"
 )
 
 // OutputJSON encodes the Response to JSON and writes to the http.ResponseWriter
@@ -20,6 +21,7 @@ func OutputJSON(rs *Response, w http.ResponseWriter, r *http.Request) error {
 		if err != nil {
 			return err
 		}
+		fmt.Printf("redirect: %s", u)
 		w.Header().Add("Location", u)
 		w.WriteHeader(302)
 	} else {
@@ -30,6 +32,7 @@ func OutputJSON(rs *Response, w http.ResponseWriter, r *http.Request) error {
 		w.WriteHeader(rs.StatusCode)
 
 		encoder := json.NewEncoder(w)
+		fmt.Printf("redirect: %v", rs.Output)
 		err := encoder.Encode(rs.Output)
 		if err != nil {
 			return err
