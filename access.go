@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -225,11 +224,6 @@ func (s *Server) handleAuthorizationCodeRequest(w *Response, r *http.Request) *A
 	}
 
 	// Verify PKCE, if present in the authorization data
-	fmt.Println(fmt.Sprintf("authorize data: %+v", ret.AuthorizeData))
-
-	fmt.Println(fmt.Sprintf("CodeChallenge: %s", ret.AuthorizeData.CodeChallenge))
-
-	fmt.Println(fmt.Sprintf("len CodeChallenge: %d", len(ret.AuthorizeData.CodeChallenge)))
 	if len(ret.AuthorizeData.CodeChallenge) > 0 {
 		// https://tools.ietf.org/html/rfc7636#section-4.1
 		if matched := pkceMatcher.MatchString(ret.CodeVerifier); !matched {
