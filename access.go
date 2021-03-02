@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -167,11 +168,13 @@ func (s *Server) handleAuthorizationCodeRequest(w *Response, r *http.Request) *A
 		HttpRequest:     r,
 	}
 
+	fmt.Println("den day 1")
 	// "code" is required
 	if ret.Code == "" {
 		s.setErrorAndLog(w, E_INVALID_GRANT, nil, "auth_code_request=%s", "code is required")
 		return nil
 	}
+	fmt.Println("den day 2")
 
 	// must have a valid client
 	if ret.Client = s.getClient(auth, w.Storage, w); ret.Client == nil {
@@ -185,6 +188,9 @@ func (s *Server) handleAuthorizationCodeRequest(w *Response, r *http.Request) *A
 		s.setErrorAndLog(w, E_INVALID_GRANT, err, "auth_code_request=%s", "error loading authorize data")
 		return nil
 	}
+
+	fmt.Println("den day 3")
+
 	if ret.AuthorizeData == nil {
 		s.setErrorAndLog(w, E_UNAUTHORIZED_CLIENT, nil, "auth_code_request=%s", "authorization data is nil")
 		return nil
@@ -197,10 +203,14 @@ func (s *Server) handleAuthorizationCodeRequest(w *Response, r *http.Request) *A
 		s.setErrorAndLog(w, E_UNAUTHORIZED_CLIENT, nil, "auth_code_request=%s", "client redirect uri is empty")
 		return nil
 	}
+
+	fmt.Println("den day 4")
 	if ret.AuthorizeData.IsExpiredAt(s.Now()) {
 		s.setErrorAndLog(w, E_INVALID_GRANT, nil, "auth_code_request=%s", "authorization data is expired")
 		return nil
 	}
+
+	fmt.Println("den day 5")
 
 	// code must be from the client
 	if ret.AuthorizeData.Client.GetId() != ret.Client.GetId() {
@@ -208,6 +218,7 @@ func (s *Server) handleAuthorizationCodeRequest(w *Response, r *http.Request) *A
 		return nil
 	}
 
+	fmt.Println("den day 6")
 	// check redirect uri
 	if ret.RedirectUri == "" {
 		ret.RedirectUri = FirstUri(ret.Client.GetRedirectUri(), s.Config.RedirectUriSeparator)
@@ -222,6 +233,8 @@ func (s *Server) handleAuthorizationCodeRequest(w *Response, r *http.Request) *A
 		s.setErrorAndLog(w, E_INVALID_REQUEST, errors.New("Redirect uri is different"), "auth_code_request=%s", "client redirect does not match authorization data")
 		return nil
 	}
+
+	fmt.Println("den day 7")
 
 	// Verify PKCE, if present in the authorization data
 	if len(ret.AuthorizeData.CodeChallenge) > 0 {
@@ -245,11 +258,15 @@ func (s *Server) handleAuthorizationCodeRequest(w *Response, r *http.Request) *A
 				"auth_code_request=%s", "pkce transform algorithm not supported (rfc7636)")
 			return nil
 		}
+
+		fmt.Println("den day 8")
 		if codeVerifier != ret.AuthorizeData.CodeChallenge {
 			s.setErrorAndLog(w, E_INVALID_GRANT, errors.New("code_verifier failed comparison with code_challenge"),
 				"auth_code_request=%s", "pkce code verifier does not match challenge")
 			return nil
 		}
+
+		fmt.Println("den day 9")
 	}
 
 	// set rest of data
