@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -224,6 +225,9 @@ func (s *Server) handleAuthorizationCodeRequest(w *Response, r *http.Request) *A
 	}
 
 	// Verify PKCE, if present in the authorization data
+	fmt.Printf("authorize data: %+v", ret.AuthorizeData)
+
+	fmt.Printf("len CodeChallenge: %d", len(ret.AuthorizeData.CodeChallenge))
 	if len(ret.AuthorizeData.CodeChallenge) > 0 {
 		// https://tools.ietf.org/html/rfc7636#section-4.1
 		if matched := pkceMatcher.MatchString(ret.CodeVerifier); !matched {
@@ -236,8 +240,10 @@ func (s *Server) handleAuthorizationCodeRequest(w *Response, r *http.Request) *A
 		codeVerifier := ""
 		switch ret.AuthorizeData.CodeChallengeMethod {
 		case "", PKCE_PLAIN:
+			fmt.Printf("CodeChallengeMethod: %s", PKCE_PLAIN)
 			codeVerifier = ret.CodeVerifier
 		case PKCE_S256:
+			fmt.Printf("CodeChallengeMethod: %s", PKCE_S256)
 			hash := sha256.Sum256([]byte(ret.CodeVerifier))
 			codeVerifier = base64.RawURLEncoding.EncodeToString(hash[:])
 		default:
@@ -245,6 +251,13 @@ func (s *Server) handleAuthorizationCodeRequest(w *Response, r *http.Request) *A
 				"auth_code_request=%s", "pkce transform algorithm not supported (rfc7636)")
 			return nil
 		}
+
+		fmt.Printf("codeVerifier: %s", codeVerifier)
+
+		fmt.Printf("CodeChallenge: %s", ret.AuthorizeData.CodeChallenge)
+
+		fmt.Printf("compare: %t", codeVerifier != ret.AuthorizeData.CodeChallenge)
+
 		if codeVerifier != ret.AuthorizeData.CodeChallenge {
 			s.setErrorAndLog(w, E_INVALID_GRANT, errors.New("code_verifier failed comparison with code_challenge"),
 				"auth_code_request=%s", "pkce code verifier does not match challenge")
