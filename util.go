@@ -4,6 +4,7 @@ import (
 	"crypto/subtle"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -73,9 +74,13 @@ func CheckBasicAuth(r *http.Request) (*BasicAuth, error) {
 func CheckBearerAuth(r *http.Request) *BearerAuth {
 	authHeader := r.Header.Get("Authorization")
 	authForm := r.FormValue("code")
+	fmt.Println(fmt.Printf("authForm:%s", authForm))
+	fmt.Println(fmt.Printf("authHeader:%s", authHeader))
 	if authHeader == "" && authForm == "" {
 		return nil
 	}
+
+	fmt.Println("check 1")
 	token := authForm
 	if authHeader != "" {
 		s := strings.SplitN(authHeader, " ", 2)
@@ -87,6 +92,7 @@ func CheckBearerAuth(r *http.Request) *BearerAuth {
 			token = s[1]
 		}
 	}
+	fmt.Println(fmt.Printf("Code:%s", token))
 	return &BearerAuth{Code: token}
 }
 
