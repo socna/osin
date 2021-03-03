@@ -1,7 +1,6 @@
 package osin
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 )
@@ -35,8 +34,6 @@ func (s *Server) HandleInfoRequest(w *Response, r *http.Request) *InfoRequest {
 	var err error
 
 	// load access data
-	fmt.Println(w.Storage.LoadAccess(ret.Code))
-
 	ret.AccessData, err = w.Storage.LoadAccess(ret.Code)
 	if err != nil {
 		s.setErrorAndLog(w, E_INVALID_REQUEST, err, "handle_info_request=%s", "failed to load access data")
