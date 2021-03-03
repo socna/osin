@@ -1,7 +1,6 @@
 package osin
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 )
@@ -36,32 +35,26 @@ func (s *Server) HandleInfoRequest(w *Response, r *http.Request) *InfoRequest {
 
 	// load access data
 	ret.AccessData, err = w.Storage.LoadAccess(ret.Code)
-	fmt.Println("den 1")
 	if err != nil {
 		s.setErrorAndLog(w, E_INVALID_REQUEST, err, "handle_info_request=%s", "failed to load access data")
 		return nil
 	}
-	fmt.Println("den 2")
 	if ret.AccessData == nil {
 		s.setErrorAndLog(w, E_INVALID_REQUEST, nil, "handle_info_request=%s", "access data is nil")
 		return nil
 	}
-	fmt.Println("den 3")
 	if ret.AccessData.Client == nil {
 		s.setErrorAndLog(w, E_UNAUTHORIZED_CLIENT, nil, "handle_info_request=%s", "access data client is nil")
 		return nil
 	}
-	fmt.Println("den 4")
 	if ret.AccessData.Client.GetRedirectUri() == "" {
 		s.setErrorAndLog(w, E_UNAUTHORIZED_CLIENT, nil, "handle_info_request=%s", "access data client redirect uri is empty")
 		return nil
 	}
-	fmt.Println("den 5")
 	if ret.AccessData.IsExpiredAt(s.Now()) {
 		s.setErrorAndLog(w, E_INVALID_GRANT, nil, "handle_info_request=%s", "access data is expired")
 		return nil
 	}
-	fmt.Println("den 6")
 
 	return ret
 }
