@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -112,6 +113,7 @@ type AccessTokenGen interface {
 
 // HandleAccessRequest is the http.HandlerFunc for handling access token requests
 func (s *Server) HandleAccessRequest(w *Response, r *http.Request) *AccessRequest {
+	fmt.Println("HandleAccessRequest")
 	// Only allow GET or POST
 	if r.Method == "GET" {
 		if !s.Config.AllowGetAccessRequest {
@@ -123,13 +125,17 @@ func (s *Server) HandleAccessRequest(w *Response, r *http.Request) *AccessReques
 		return nil
 	}
 
+	fmt.Println("HandleAccessRequest1")
 	err := r.ParseForm()
 	if err != nil {
 		s.setErrorAndLog(w, E_INVALID_REQUEST, err, "access_request=%s", "parsing error")
 		return nil
 	}
+	fmt.Println("HandleAccessRequest2")
 
 	grantType := AccessRequestType(r.FormValue("grant_type"))
+
+	fmt.Println(grantType)
 	if s.Config.AllowedAccessTypes.Exists(grantType) {
 		switch grantType {
 		case AUTHORIZATION_CODE:
