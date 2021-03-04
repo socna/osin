@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -434,19 +435,25 @@ func (s *Server) handleAssertionRequest(w *Response, r *http.Request) *AccessReq
 		HttpRequest:     r,
 	}
 
+	fmt.Println("den 1")
 	// "assertion_type" and "assertion" is required
 	if ret.AssertionType == "" || ret.Assertion == "" {
 		s.setErrorAndLog(w, E_INVALID_GRANT, nil, "handle_assertion_request=%s", "assertion and assertion_type required")
 		return nil
 	}
 
+	fmt.Println("den 2")
+
 	// must have a valid client
 	if ret.Client = s.getClient(auth, w.Storage, w); ret.Client == nil {
 		return nil
 	}
 
+	fmt.Println("den 3")
+
 	// set redirect uri
 	ret.RedirectUri = FirstUri(ret.Client.GetRedirectUri(), s.Config.RedirectUriSeparator)
+	fmt.Println("den 4")
 
 	return ret
 }
